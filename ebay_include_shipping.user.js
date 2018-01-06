@@ -4,7 +4,7 @@
 // @description	Show the true total including shipping on Ebay
 // @homepageURL	https://github.com/daraeman/ebay_include_shipping
 // @author		daraeman
-// @version		1.0
+// @version		1.0.1
 // @date		2018-01-05
 // @include		/https?:\/\/www\.ebay\.com\/*/
 // @require		https://code.jquery.com/jquery-3.2.1.slim.min.js
@@ -47,7 +47,14 @@
 
 	function addSearchItemShippingPrice( el, price, currency ) {
 		let price_parent_el = el.find( ".lvprices .lvprice" );
-		price_parent_el.append( '<br><span style="display: inline-block; margin-top: 4px;">'+ currency + price.toFixed( 2 ).toString() +' including shipping</span>' );
+		price_parent_el.prepend( '<span class="bold ebay_include_shipping">'+ currency + price.toFixed( 2 ).toString() +' with shipping</span><br>' );
+		let item_price_el = price_parent_el.find( ".bold:not( .ebay_include_shipping )" );
+		item_price_el.text(  "(" + item_price_el.text().trim() + ")" );
+		item_price_el.removeClass( "bold" ).css( {
+			"display": "inline-block",
+			"margin-top": "4px",
+			"font-size": "13px",
+		});
 	}
 
 	function init() {
