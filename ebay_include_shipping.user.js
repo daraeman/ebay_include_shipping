@@ -4,8 +4,8 @@
 // @description	Show the true total including shipping on Ebay
 // @homepageURL	https://github.com/daraeman/ebay_include_shipping
 // @author		daraeman
-// @version		1.0.1
-// @date		2018-01-05
+// @version		1.0.2
+// @date		2018-03-27
 // @include		/https?:\/\/www\.ebay\.com\/*/
 // @require		https://code.jquery.com/jquery-3.2.1.slim.min.js
 // @require		https://cdnjs.cloudflare.com/ajax/libs/big.js/5.0.3/big.min.js
@@ -34,13 +34,9 @@
 
 		$( "#ListViewInner .sresult" ).each( ( i, node ) => {
 			let el = $( node );
-//			console.log( "el", el )
 			let item_text = getItemPriceEl( el ).text().trim();
-//			console.log( "item_text", item_text )
 			let currency = item_text[0];
-//			console.log( "currency", currency )
 			let item_price = new Big( item_text.substr( 1 ) );
-//			console.log( "item_price", item_price )
 			let shipping_text = getShippingPriceEl( el ).text().trim().substr( 2 ).replace( "shipping", "" ).trim();	
 			if ( shipping_text ) {
 				let shipping_price = new Big( shipping_text );
