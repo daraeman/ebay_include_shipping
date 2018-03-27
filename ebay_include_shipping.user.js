@@ -65,7 +65,7 @@
 
 	function addSearchItemShippingPrice( el, price, currency ) {
 		let price_parent_el = getShippingPriceParentEl( el );
-		price_parent_el.prepend( '<span class="bold ebay_include_shipping">'+ currency + price.toFixed( 2 ).toString() +' with shipping</span><br>' );
+		price_parent_el.prepend( '<span class="bold ebay_include_shipping">'+ currency + price.toFixed( 2 ).toString() +' incl. shipping</span><br>' );
 		let item_price_el = getItemPriceEl( el, true );
 		let shipping_price_el = getShippingPriceEl( el );
 		item_price_el.text( "(" + item_price_el.text().trim() + shipping_price_el.text().trim().replace( "+", " + " ) +")" );
