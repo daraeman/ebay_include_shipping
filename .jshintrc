@@ -1,0 +1,20 @@
+{
+	"browser": true,
+	"esnext": true,
+	"globals": {
+		"Big": true,
+		"jQuery": true
+	},
+	"strict": "implied",
+	"undef": true,
+	"unused": true,
+	"devel": true,
+	"maxerr": 9999,
+	"predef": [  ],
+	"indent": 1,
+	"nonstandard": true,
+	"laxbreak": true,
+	"esnext": true,
+	"loopfunc": true,
+	"unused": false
+}
