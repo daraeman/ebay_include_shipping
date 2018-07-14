@@ -4,8 +4,8 @@
 // @description	Show the true total including shipping on Ebay
 // @homepageURL	https://github.com/daraeman/ebay_include_shipping
 // @author		daraeman
-// @version		1.0.2
-// @date		2018-03-27
+// @version		1.0.3
+// @date		2018-07-14
 // @include		/https?:\/\/www\.ebay\.com\/*/
 // @require		https://code.jquery.com/jquery-3.2.1.slim.min.js
 // @require		https://cdnjs.cloudflare.com/ajax/libs/big.js/5.0.3/big.min.js
@@ -15,29 +15,41 @@
 
 (function( $, Big ) {
 
+	const debug = false;
 	let page;
 
+	log( "Ebay Include Shipping" );
+
 	function getPage() {
-		if ( $( "#Results" ).length )
+		log( "getPage" );
+		if ( $( "body.s-page" ).length )
 			page = "search";
 	}
 
 	function doPage() {
+		log( "doPage" );
 		if ( page === "search" )
 			doSearchPage();
 	}
 
 	function doSearchPage() {
+		log( "doSearchPage" );
 
-		// hide the "previous price" thing since its not very useful and screw up the formatting
-		$( ".cmpat" ).hide();
-
-		$( "#ListViewInner .sresult" ).each( ( i, node ) => {
+		$( ".srp-results .s-item" ).each( ( i, node ) => {
 			let el = $( node );
+			log( "el", el );
 			let item_text = getItemPriceEl( el ).text().trim();
+			log( "item_text", item_text );
 			let currency = item_text[0];
-			let item_price = new Big( item_text.substr( 1 ) );
-			let shipping_text = getShippingPriceEl( el ).text().trim().substr( 2 ).replace( "shipping", "" ).trim();	
+			log( "currency", currency );
+			let price_string = item_text.substr( 1 );
+			log( "price_string", price_string );
+			let item_price = new Big( price_string );
+			log( "item_price", item_price );
+			let shipping_string = getShippingPriceEl( el ).text();
+			log( "shipping_string", shipping_string );
+			let shipping_text = ( /shipping/.test( shipping_string ) ) ? shipping_string.trim().substr( 2 ).replace( /shipping/, "" ).trim() : "";	
+			log( "shipping_text", shipping_text );	
 			if ( shipping_text ) {
 				let shipping_price = new Big( shipping_text );
 				addSearchItemShippingPrice( el, item_price.plus( shipping_price ), currency );
@@ -46,34 +58,52 @@
 	}
 
 	function getItemPriceEl( parent, post_add ) {
-		let selector = ( post_add ) ? ".bold:not( .ebay_include_shipping )" : ".bold";
-		let this_parent = getShippingPriceParentEl( parent );
-		return this_parent.find( selector );
+		log( "doSearchPage", parent, post_add );
+		let selector = ( post_add ) ? ".s-item__price:not( .ebay_include_shipping )" : ".s-item__price";
+		return parent.find( selector );
 	}
 
 	function getShippingPriceEl( parent ) {
-		return parent.find( ".lvshipping .ship .fee" );
+		log( "doSearchPage", parent );
+		return parent.find( ".s-item__shipping" );
 	}
 
-	function getShippingPriceParentEl( parent ) {
-		return parent.find( ".lvprices .lvprice" );
+	function getShippingPriceParentEl( el ) {
+		log( "getShippingPriceParentEl", el );
+		return el.parent();
 	}
 
 	function addSearchItemShippingPrice( el, price, currency ) {
+		log( "addSearchItemShippingPrice", el, price, currency );
 		let price_parent_el = getShippingPriceParentEl( el );
-		price_parent_el.prepend( '<span class="bold ebay_include_shipping">'+ currency + price.toFixed( 2 ).toString() +' incl. shipping</span><br>' );
+		log( "price_parent_el", price_parent_el );
 		let item_price_el = getItemPriceEl( el, true );
+		log( "item_price_el", item_price_el );
+		let item_price = item_price_el.text();
+		log( "item_price", item_price );
+		item_price_el.html( '<span class="ebay_include_shipping">'+ currency + price.toFixed( 2 ).toString() +' incl. shipping</span><br>' );
+		item_price_el.find( "span" ).css( {
+			"font-size": "20px",
+		});
 		let shipping_price_el = getShippingPriceEl( el );
-		item_price_el.text( "(" + item_price_el.text().trim() + shipping_price_el.text().trim().replace( "+", " + " ) +")" );
-		item_price_el.removeClass( "bold" ).css( {
+		log( "shipping_price_el", shipping_price_el );
+		item_price_el.append( '<span class="ebay_include_shipping">(' + item_price.trim() + shipping_price_el.text().trim().replace( "+", " + " ) +")</span>" );
+		item_price_el.find( "span" ).last().css({
 			"display": "inline-block",
 			"margin-top": "4px",
 			"font-size": "13px",
+			"font-weight": 400,
 		});
 		shipping_price_el.hide();
 	}
 
+	function log() {
+		if ( debug )
+			console.log( ...arguments );
+	}
+
 	function init() {
+		log( "init" );
 		getPage();
 		doPage();
 	}
