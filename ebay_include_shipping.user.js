@@ -4,8 +4,8 @@
 // @description	Show the true total including shipping on Ebay
 // @homepageURL	https://github.com/daraeman/ebay_include_shipping
 // @author		daraeman
-// @version		1.0.3
-// @date		2018-07-14
+// @version		1.0.4
+// @date		2018-07-20
 // @include		/https?:\/\/www\.ebay\.com\/*/
 // @require		https://code.jquery.com/jquery-3.2.1.slim.min.js
 // @require		https://cdnjs.cloudflare.com/ajax/libs/big.js/5.0.3/big.min.js
@@ -15,7 +15,8 @@
 
 (function( $, Big ) {
 
-	const debug = false;
+	const debug = true;
+	const debug_error = true;
 	let page;
 
 	log( "Ebay Include Shipping" );
@@ -44,8 +45,18 @@
 			log( "currency", currency );
 			let price_string = item_text.substr( 1 );
 			log( "price_string", price_string );
-			let item_price = new Big( price_string );
-			log( "item_price", item_price );
+			if ( / to /.test( price_string ) ) {
+				log( "multiple prices detected [%s], skipping", price_string );
+				return;
+			}
+			let item_price;
+			try {
+				item_price = new Big( price_string );
+				log( "item_price", item_price );
+			} catch ( error ) {
+				error( "error while parsing number [%s]", item_price );
+				return;
+			}
 			let shipping_string = getShippingPriceEl( el ).text();
 			log( "shipping_string", shipping_string );
 			let shipping_text = ( /shipping/.test( shipping_string ) ) ? shipping_string.trim().substr( 2 ).replace( /shipping/, "" ).trim() : "";	
@@ -100,6 +111,11 @@
 	function log() {
 		if ( debug )
 			console.log( ...arguments );
+	}
+
+	function error() {
+		if ( debug_error )
+			console.error( ...arguments );
 	}
 
 	function init() {
